@@ -17,8 +17,7 @@ export default function Home() {
 		[...new Array(PIZZA_SKELETON_QUANTITY)].map((_, i) => (
 			<PizzaBlockSkeleton key={i}></PizzaBlockSkeleton>
 		));
-	const renderItems = () =>
-		items.map(pizza => <PizzaBlock key={pizza.id} {...pizza} />);
+	const renderItems = () => items.map(pizza => <PizzaBlock key={pizza.id} {...pizza} />);
 
 	useEffect(() => {
 		setIsLoading(true);
