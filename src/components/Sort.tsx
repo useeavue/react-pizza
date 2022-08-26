@@ -28,9 +28,7 @@ export default function Sort({ activeSort, onClickSort }: SortContext) {
 					/>
 				</svg>
 				<b>Сортировка по:</b>
-				<span onClick={() => setPopupOpen(!isPopupOpen)}>
-					{currentSort}
-				</span>
+				<span onClick={() => setPopupOpen(!isPopupOpen)}>{currentSort}</span>
 			</div>
 			{isPopupOpen && (
 				<div className='sort__popup'>
