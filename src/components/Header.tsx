@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom';
+import { SearchService } from '../shared/services/search.service';
+import Search from './Search/Search';
 
-export default function Header() {
+type Props = {
+	search: SearchService;
+};
+
+export default function Header({ search }: Props) {
 	return (
 		<div className='header'>
 			<div className='container'>
@@ -13,6 +19,7 @@ export default function Header() {
 						</div>
 					</div>
 				</Link>
+				<Search search={search} />
 				<div className='header__cart'>
 					<Link to='/cart' className='button button--cart'>
 						<span>520 ₽</span>

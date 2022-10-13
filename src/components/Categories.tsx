@@ -1,6 +1,7 @@
-import { CategoriesContext } from '../models/context';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { setCategoryId } from '../store/slices/categoriesSlice';
 
-export default function Categories({ activeValue, onClickCategory }: CategoriesContext) {
+export default function Categories() {
 	const categoryTitles: string[] = [
 		'Все',
 		'Мясные',
@@ -10,14 +11,17 @@ export default function Categories({ activeValue, onClickCategory }: CategoriesC
 		'Закрытые',
 	];
 
+	const active = useAppSelector(state => state.categories.categoryId);
+	const dispatch = useAppDispatch();
+
 	return (
 		<div className='categories'>
 			<ul>
 				{categoryTitles.map((category, i) => (
 					<li
 						key={category}
-						onClick={() => onClickCategory(i)}
-						className={activeValue === i ? 'active' : ''}
+						onClick={() => dispatch(setCategoryId(i))}
+						className={active === i ? 'active' : ''}
 					>
 						{category}
 					</li>

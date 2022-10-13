@@ -1,11 +1,11 @@
-export enum Sorting {
+export enum SortMethod {
 	Popularity,
 	Price,
 	Title,
 }
 
-export const sortTitles: Record<Sorting, string> = {
-	[Sorting.Popularity]: 'популярности',
-	[Sorting.Price]: 'цене',
-	[Sorting.Title]: 'алфавиту',
+export const sortMethodTitles: Record<SortMethod, string> = {
+	[SortMethod.Popularity]: 'популярности',
+	[SortMethod.Price]: 'цене',
+	[SortMethod.Title]: 'алфавиту',
 };

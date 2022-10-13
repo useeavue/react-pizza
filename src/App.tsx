@@ -5,14 +5,17 @@ import Header from './components/Header';
 import Cart from './pages/Cart';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import { SearchService } from './shared/services/search.service';
 
 export default function App() {
+	const search = new SearchService();
+
 	return (
 		<div className='wrapper'>
-			<Header />
+			<Header search={search} />
 			<div className='content'>
 				<Routes>
-					<Route path='/' element={<Home />} />
+					<Route path='/' element={<Home search={search} />} />
 					<Route path='/cart' element={<Cart />} />
 					<Route path='*' element={<NotFound />} />
 				</Routes>

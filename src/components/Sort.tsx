@@ -1,11 +1,15 @@
-import { useState } from 'react';
-import { SortContext } from '../models/context';
-import { sortTitles } from '../models/sort';
+import { Dispatch, useState } from 'react';
+import { sortMethodTitles } from '../models/sort';
 
-export default function Sort({ activeSort, onClickSort }: SortContext) {
-	const sortTitlesArr: string[] = Object.values(sortTitles);
+interface SortProps {
+	activeSort: number;
+	onClickSort: Dispatch<React.SetStateAction<number>>;
+}
+
+export default function Sort({ activeSort, onClickSort }: SortProps) {
+	const sortTitles: string[] = Object.values(sortMethodTitles);
 	const [isPopupOpen, setPopupOpen] = useState(false);
-	const currentSort = sortTitlesArr[activeSort];
+	const currentSort = sortTitles[activeSort];
 
 	const selectSortClosePopup = (index: number) => {
 		onClickSort(index);
@@ -33,7 +37,7 @@ export default function Sort({ activeSort, onClickSort }: SortContext) {
 			{isPopupOpen && (
 				<div className='sort__popup'>
 					<ul>
-						{sortTitlesArr.map((title, i) => (
+						{sortTitles.map((title, i) => (
 							<li
 								key={title}
 								className={activeSort === i ? 'active' : ''}

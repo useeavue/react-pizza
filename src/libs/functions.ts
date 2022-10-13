@@ -1,13 +1,13 @@
-import { Sorting } from '../models/sort';
+import { SortMethod } from '../models/sort';
 
-export const sortBy = (index: number) => {
+export const sortBy = (index: SortMethod) => {
 	switch (index) {
-		case Sorting.Popularity:
-			return 'sortBy=rating&order=desc';
-		case Sorting.Price:
-			return 'sortBy=price';
-		case Sorting.Title:
-			return 'sortBy=title';
+		case SortMethod.Popularity:
+			return 'sortBy=rating&order=desc&';
+		case SortMethod.Price:
+			return 'sortBy=price&';
+		case SortMethod.Title:
+			return 'sortBy=title&';
 		default:
 			return '';
 	}
