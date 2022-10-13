@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { debounceTime, distinctUntilChanged, ReplaySubject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, from, ReplaySubject, takeUntil } from 'rxjs';
 import Categories from '../components/Categories';
 import PizzaBlock from '../components/PizzaBlock';
 import PizzaBlockSkeleton from '../components/PizzaBlock/PizzaBlockSkeleton';
@@ -21,7 +21,6 @@ export default function Home({ search }: Props) {
 	const [activeSort, setActiveSort] = useState(0);
 	const [searchInput, setSearchInput] = useState('');
 	const destroy$ = new ReplaySubject<void>(1);
-
 	const renderSkeleton = () =>
 		[...new Array(PIZZA_SKELETON_QUANTITY)].map((_, i) => (
 			<PizzaBlockSkeleton key={i}></PizzaBlockSkeleton>
@@ -31,21 +30,28 @@ export default function Home({ search }: Props) {
 	const category = (active: number) => (active ? `category=${active}&` : '');
 	const searchString = (title: string) => (title ? `title=${title}&` : '');
 
-	useEffect(() => {
-		setIsLoading(true);
+	const fetchItems = from(
 		fetch(
 			`https://62ecc63f818ab252b601df3e.mockapi.io/items?${category(
 				activeCategory
 			)}${sortBy(activeSort)}${searchString(searchInput)}`
-		)
-			.then(res => res.json())
-			.then((data: Pizza[]) => {
+		).then(res => res.json())
+	);
+
+	useEffect(() => {
+		setIsLoading(true);
+
+		fetchItems.pipe(takeUntil(destroy$)).subscribe({
+			next: (data: Pizza[]) => {
 				setItems(data);
 				setIsLoading(false);
-			})
-			.catch(err => {
+			},
+			error: err => {
+				setItems([]);
+				setIsLoading(false);
 				console.error(err);
-			});
+			},
+		});
 
 		search.searchString
 			.pipe(takeUntil(destroy$), debounceTime(700), distinctUntilChanged())
