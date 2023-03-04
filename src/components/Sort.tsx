@@ -1,20 +1,34 @@
-import { Dispatch, useState } from 'react';
+import { useEffect } from 'react';
+import { fromEvent, ReplaySubject, takeUntil } from 'rxjs';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { sortMethodTitles } from '../models/sort';
+import { setActiveSort, togglePopup } from '../store/slices/filterSlice';
 
-interface SortProps {
-	activeSort: number;
-	onClickSort: Dispatch<React.SetStateAction<number>>;
-}
-
-export default function Sort({ activeSort, onClickSort }: SortProps) {
+export default function Sort() {
 	const sortTitles: string[] = Object.values(sortMethodTitles);
-	const [isPopupOpen, setPopupOpen] = useState(false);
-	const currentSort = sortTitles[activeSort];
+	const activeSort = useAppSelector(state => state.filter.activeSort);
+	const isPopupOpen = useAppSelector(state => state.filter.activePopup);
+	const currentSortTitle = sortTitles[activeSort];
 
-	const selectSortClosePopup = (index: number) => {
-		onClickSort(index);
-		setPopupOpen(false);
-	};
+	const destroy$ = new ReplaySubject<void>(1);
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		fromEvent(document, 'click')
+			.pipe(takeUntil(destroy$))
+			.subscribe(e => {
+				const clickShouldClose = !(e.target as Element).closest('.sort__label');
+				if (clickShouldClose && isPopupOpen) {
+					dispatch(togglePopup());
+				}
+			});
+
+		return () => {
+			destroy$.next();
+			destroy$.complete();
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isPopupOpen]);
 
 	return (
 		<div className='sort'>
@@ -32,7 +46,7 @@ export default function Sort({ activeSort, onClickSort }: SortProps) {
 					/>
 				</svg>
 				<b>Сортировка по:</b>
-				<span onClick={() => setPopupOpen(!isPopupOpen)}>{currentSort}</span>
+				<span onClick={() => dispatch(togglePopup())}>{currentSortTitle}</span>
 			</div>
 			{isPopupOpen && (
 				<div className='sort__popup'>
@@ -41,7 +55,7 @@ export default function Sort({ activeSort, onClickSort }: SortProps) {
 							<li
 								key={title}
 								className={activeSort === i ? 'active' : ''}
-								onClick={() => selectSortClosePopup(i)}
+								onClick={() => dispatch(setActiveSort(i))}
 							>
 								{title}
 							</li>

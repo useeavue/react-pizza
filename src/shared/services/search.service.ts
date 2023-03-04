@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
 
 export class SearchService {
-	public searchString = new Subject<string>();
+	public searchString$ = new Subject<string>();
 }

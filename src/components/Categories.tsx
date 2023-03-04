@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { setCategoryId } from '../store/slices/categoriesSlice';
+import { setActiveCategory } from '../store/slices/filterSlice';
 
 export default function Categories() {
 	const categoryTitles: string[] = [
@@ -11,7 +11,7 @@ export default function Categories() {
 		'Закрытые',
 	];
 
-	const active = useAppSelector(state => state.categories.categoryId);
+	const activeCategory = useAppSelector(state => state.filter.activeCategory);
 	const dispatch = useAppDispatch();
 
 	return (
@@ -20,8 +20,8 @@ export default function Categories() {
 				{categoryTitles.map((category, i) => (
 					<li
 						key={category}
-						onClick={() => dispatch(setCategoryId(i))}
-						className={active === i ? 'active' : ''}
+						onClick={() => dispatch(setActiveCategory(i))}
+						className={activeCategory === i ? 'active' : ''}
 					>
 						{category}
 					</li>

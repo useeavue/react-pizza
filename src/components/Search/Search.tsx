@@ -42,7 +42,7 @@ const Search = ({ search }: Props) => {
 				className={styles.input}
 				type='text'
 				onChange={event => {
-					search.searchString.next(event.currentTarget.value);
+					search.searchString$.next(event.currentTarget.value);
 				}}
 				placeholder='поиск'
 			/>

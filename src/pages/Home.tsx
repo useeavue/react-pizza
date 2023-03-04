@@ -4,12 +4,13 @@ import Categories from '../components/Categories';
 import PizzaBlock from '../components/PizzaBlock';
 import PizzaBlockSkeleton from '../components/PizzaBlock/PizzaBlockSkeleton';
 import Sort from '../components/Sort';
-import { sortBy } from '../libs/functions';
+import { searchString, sortBy, category } from '../libs/functions';
 import { Pizza } from '../models/pizza';
 import { SearchService } from '../shared/services/search.service';
 import { PIZZA_SKELETON_QUANTITY } from '../shared/constants';
 import NotFoundBlock from '../components/NotFoundBlock';
 import { useAppSelector } from '../hooks/redux';
+import axios from 'axios';
 
 type Props = {
 	search: SearchService;
@@ -18,43 +19,45 @@ type Props = {
 export default function Home({ search }: Props) {
 	const [items, setItems] = useState<Pizza[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeSort, setActiveSort] = useState(0);
 	const [searchInput, setSearchInput] = useState('');
+
 	const destroy$ = new ReplaySubject<void>(1);
+
 	const renderSkeleton = () =>
 		[...new Array(PIZZA_SKELETON_QUANTITY)].map((_, i) => (
 			<PizzaBlockSkeleton key={i}></PizzaBlockSkeleton>
 		));
 	const renderItems = () => items.map(pizza => <PizzaBlock key={pizza.id} {...pizza} />);
-	const activeCategory = useAppSelector(state => state.categories.categoryId);
-	const category = (active: number) => (active ? `category=${active}&` : '');
-	const searchString = (title: string) => (title ? `title=${title}&` : '');
 
-	const fetchItems = from(
-		fetch(
-			`https://62ecc63f818ab252b601df3e.mockapi.io/items?${category(
-				activeCategory
-			)}${sortBy(activeSort)}${searchString(searchInput)}`
-		).then(res => res.json())
+	const activeCategory = useAppSelector(state => state.filter.activeCategory);
+	const activeSort = useAppSelector(state => state.filter.activeSort);
+
+	const fetchItems$ = from(
+		axios
+			.get(
+				`https://62ecc63f818ab252b601df3e.mockapi.io/items?${category(
+					activeCategory
+				)}${sortBy(activeSort)}${searchString(searchInput)}`
+			)
+			.then(res => res.data)
 	);
 
 	useEffect(() => {
 		setIsLoading(true);
 
-		fetchItems.pipe(takeUntil(destroy$)).subscribe({
+		fetchItems$.pipe(takeUntil(destroy$)).subscribe({
 			next: (data: Pizza[]) => {
 				setItems(data);
 				setIsLoading(false);
 			},
 			error: err => {
-				setItems([]);
 				setIsLoading(false);
 				console.error(err);
 			},
 		});
 
-		search.searchString
-			.pipe(takeUntil(destroy$), debounceTime(700), distinctUntilChanged())
+		search.searchString$
+			.pipe(takeUntil(destroy$), debounceTime(300), distinctUntilChanged())
 			.subscribe(value => {
 				if (!value.trim()) setSearchInput('');
 				if (value.length < 3) return;
@@ -74,7 +77,7 @@ export default function Home({ search }: Props) {
 		<div className='container'>
 			<div className='content__top'>
 				<Categories />
-				<Sort activeSort={activeSort} onClickSort={setActiveSort} />
+				<Sort />
 			</div>
 			<h2 className='content__title'>Все пиццы</h2>
 			<div className='content__items'>

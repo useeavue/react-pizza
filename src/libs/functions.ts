@@ -12,3 +12,7 @@ export const sortBy = (index: SortMethod) => {
 			return '';
 	}
 };
+
+export const category = (active: number) => (active ? `category=${active}&` : '');
+
+export const searchString = (title: string) => (title ? `title=${title}&` : '');
